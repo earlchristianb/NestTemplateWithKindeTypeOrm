@@ -19,12 +19,12 @@ import { JwtAuthGuard } from '../common/guards/jwt.guard';
 import { Permissions } from '../common/decorators/permissions.decorator';
 import { IS_ADMIN } from '../common/constants/constants';
 
-@UseGuards(JwtAuthGuard)
-@Permissions(IS_ADMIN)
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Permissions(IS_ADMIN)
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
     console.log(createProductDto);
@@ -48,16 +48,20 @@ export class ProductController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Permissions(IS_ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productService.findOne(id);
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Permissions(IS_ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAuthorDto: UpdateProductDto) {
     return this.productService.update(id, updateAuthorDto);
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Permissions(IS_ADMIN)
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id') id: string) {

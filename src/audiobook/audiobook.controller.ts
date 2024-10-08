@@ -8,13 +8,19 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AudiobookService } from './audiobook.service';
 import { CreateAudiobookDto } from './dto/create-audiobook.dto';
 import { UpdateAudiobookDto } from './dto/update-audiobook.dto';
 import { Audiobook } from './entities/audiobook.entity';
 import { parseSkipLimit } from '../common/utils/common.utils';
+import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { IS_ADMIN } from 'src/common/constants/constants';
 
+@UseGuards(JwtAuthGuard)
+@Permissions(IS_ADMIN)
 @Controller('audiobook')
 export class AudiobookController {
   constructor(private readonly audiobookService: AudiobookService) {}
