@@ -1,11 +1,10 @@
-
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
-
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -50,6 +49,9 @@ export class User {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 
   @BeforeInsert()
   @BeforeUpdate()

@@ -10,6 +10,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from './common/guards/permissions.guard';
 import { JwtAuthGuard } from './common/guards/jwt.guard';
+import { ProductModule } from './product/product.module';
+import { AudiobookModule } from './audiobook/audiobook.module';
+import { AuthorModule } from './author/author.module';
+import { Author } from './author/entities/author.entity';
+import { Audiobook } from './audiobook/entities/audiobook.entity';
+import { Product } from './product/entities/product.entity';
 
 @Module({
   imports: [
@@ -26,16 +32,21 @@ import { JwtAuthGuard } from './common/guards/jwt.guard';
         type: 'postgres',
         url: appConfig.dbUrl,
         logging: true,
-        entities: [ User,],
+        entities: [User, Author, Audiobook, Product],
         synchronize: true,
       }),
     }),
     JwtModule.register({
       global: true,
     }),
-    
+
     UserModule,
-   
+
+    ProductModule,
+
+    AudiobookModule,
+
+    AuthorModule,
   ],
   providers: [
     {

@@ -4,6 +4,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -12,11 +13,12 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './dtos/user.dto';
-import { IS_ADMIN } from 'src/common/constants/constants';
-import { GetUser } from 'src/common/decorators/get-user.param.decorator';
-import { RequestUser } from 'src/common/types/request-user.type';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { IS_ADMIN } from '../common/constants/constants';
+import { GetUser } from '../common/decorators/get-user.param.decorator';
+import { RequestUser } from '../common/types/request-user.type';
+import { JwtAuthGuard } from '../common/guards/jwt.guard';
+import { Permissions } from '../common/decorators/permissions.decorator';
+import { parseSkipLimit } from '../common/utils/common.utils';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard)
@@ -26,38 +28,14 @@ export class UserController {
   @Permissions(IS_ADMIN)
   @Get()
   findAll(
-    
-    @Query('skip') skip: string,
     @Query('limit') limit: string,
+    @Query('skip') skip: string,
     @Query('search') search: string,
   ) {
-    console.log('skip', skip);
-    console.log('limit', limit);
-    console.log('search', search);
-    const parsedSkip = parseInt(skip, 10) || 0;
-    const parsedLimit =
-      limit === 'all' ? Number.MAX_SAFE_INTEGER : parseInt(limit, 10) || 10;
-    let organizationId = ""
-    let teamId = ""
-    if (organizationId) {
-      return this.userService.findAllByOrganization({
-        organizationId,
-        skip: parsedSkip,
-        limit: parsedLimit,
-        search,
-      });
-    }
-    if (teamId) {
-      return this.userService.findAllByTeam({
-        teamId,
-        skip: parsedSkip,
-        limit: parsedLimit,
-        search,
-      });
-    }
+    const { parsedLimit, parsedSkip } = parseSkipLimit(skip, limit);
     return this.userService.findAll({
-      skip: parsedSkip,
       limit: parsedLimit,
+      skip: parsedSkip,
       search,
     });
   }
@@ -81,7 +59,6 @@ export class UserController {
     if (user.sub === id) {
       return this.userService.update(id, data);
     }
-
     if (!user.permissions.includes(IS_ADMIN)) {
       throw new ForbiddenException(
         'You do not have permission to perform this action',
@@ -93,6 +70,7 @@ export class UserController {
 
   @Permissions(IS_ADMIN)
   @Delete(':id')
+  @HttpCode(200)
   remove(@Param('id') id: string) {
     return this.userService.removeOne(id);
   }
